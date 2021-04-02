@@ -1,6 +1,6 @@
 # Sand
 
-A simple very low level language near Assembler.
+A simple very low level language similar to LLVM and near assembler.
 
 This repository contains a library that can be used to parse and compile a program in `Sand` for some architectures, including a custom VM.
 Moreover, it will include two crates with a cli and a VM.
