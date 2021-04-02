@@ -1,7 +1,10 @@
-use doclog::Log;
+use jpar::Span;
 
-/// The error object that all parsers return.
-#[derive(Debug, Clone)]
-pub struct ParserError {
-    log: Log,
+/// The trait all parser nodes implement.
+pub trait ParserNode<'a> {
+    fn span(&self) -> &Span<'a>;
+
+    fn span_content(&self) -> &'a str {
+        self.span().content()
+    }
 }
