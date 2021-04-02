@@ -29,6 +29,10 @@ impl<'a> Comment<'a> {
     }
 
     /// Creates a new node without checking its values.
+    ///
+    /// # Safety
+    ///
+    /// Using this method can lead to an incorrect representation of a comment.
     pub unsafe fn new_unchecked(span: Span<'a>) -> Comment<'a> {
         Comment { span }
     }
@@ -50,6 +54,11 @@ impl<'a> Comment<'a> {
         true
     }
 
+    /// Sets the span of the node without checking it.
+    ///
+    /// # Safety
+    ///
+    /// Using this method can lead to an incorrect representation of a comment.
     pub unsafe fn set_span_unchecked(&mut self, span: Span<'a>) {
         self.span = span;
     }
@@ -68,7 +77,7 @@ impl<'a> Comment<'a> {
                         read_none_of0(char_verifier('\n')),
                     )),
                 ),
-                |_, (ws, content)| content.len() == 0 || ws.len() == 1,
+                |_, (ws, content)| content.is_empty() || ws.len() == 1,
             ),
             |input, _| Comment {
                 span: input.substring_to_current(&init_cursor),
@@ -166,7 +175,7 @@ mod test {
         let content = "#[tag]";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Comment::parse(&mut input).expect_err("The parser must not succeed");
+        let comment = Comment::parse(&mut input).expect_err("[1] The parser must not succeed");
         assert!(comment.is_not_found(), "[1] The error is incorrect");
 
         // Case 2: empty
@@ -174,7 +183,7 @@ mod test {
         let content = "";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Comment::parse(&mut input).expect_err("The parser must not succeed");
+        let comment = Comment::parse(&mut input).expect_err("[2] The parser must not succeed");
         assert!(comment.is_not_found(), "[2] The error is incorrect");
     }
 }
