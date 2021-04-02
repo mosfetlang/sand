@@ -5,8 +5,7 @@ use jpar::sequence::{preceded, tuple};
 use jpar::verifiers::char_verifier;
 use jpar::Span;
 
-use crate::parser::traits::ParserNode;
-use crate::parser::{ParserInput, ParserResult};
+use crate::parsers::{ParserInput, ParserNode, ParserResult};
 
 pub static COMMENT_START_TOKEN: &str = "#";
 
@@ -97,7 +96,7 @@ impl<'a> ParserNode<'a> for Comment<'a> {
 
 #[cfg(test)]
 mod test {
-    use crate::parser::ParserContext;
+    use crate::parsers::ParserContext;
 
     use super::*;
 
