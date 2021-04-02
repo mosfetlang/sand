@@ -7,3 +7,11 @@ edition = "2018"
 [dependencies]
 doclog = { version = "0.1.0", path = "../doclog" }
 jpar = { version = "0.1.0", path = "../jpar" }
+
+[dev-dependencies]
+criterion = "0.3.4"
+
+[[bench]]
+name = "parsers"
+path = "benches/parsers/mod.rs"
+harness = false
