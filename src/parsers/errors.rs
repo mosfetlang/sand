@@ -1,7 +1,17 @@
 use doclog::Log;
 
-/// The error object that all parsers return.
+/// The errors that parsers can throw.
 #[derive(Debug, Clone)]
-pub struct ParserError {
-    log: Log,
+pub struct ParserError<'a> {
+    pub kind: ParserErrorKind,
+    pub log: Log<'a>,
+}
+
+/// The kind of error.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub enum ParserErrorKind {
+    NumberWithoutDigitsAfterDecimalSeparator,
+    NumberWithoutDigitsAfterExponentToken,
+    NumberTooBig,
+    NumberTooBigExponent,
 }

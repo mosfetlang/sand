@@ -39,7 +39,7 @@ impl<'a> Whitespace<'a> {
     // STATIC METHODS -----–-----–-----–-----–-----–-----–-----–-----–-----–---
 
     /// Parses a multiline whitespace that can include comments.
-    pub fn parse(input: &mut ParserInput<'a>) -> ParserResult<Whitespace<'a>> {
+    pub fn parse(input: &mut ParserInput<'a>) -> ParserResult<'a, Whitespace<'a>> {
         let init_cursor = input.save_cursor();
         let mut parser = map_result(
             repeat_and_count(
@@ -81,9 +81,9 @@ mod test {
         let content = "  \t\n  \r\nidentifier";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Whitespace::parse(&mut input).expect("[1] The parser must succeed");
+        let result = Whitespace::parse(&mut input).expect("[1] The parser must succeed");
         assert_eq!(
-            comment.span_content(),
+            result.span_content(),
             "  \t\n  \r\n",
             "[1] The content is incorrect"
         );
@@ -93,9 +93,9 @@ mod test {
         let content = "  # This is a test\n content";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Whitespace::parse(&mut input).expect("[2] The parser must succeed");
+        let result = Whitespace::parse(&mut input).expect("[2] The parser must succeed");
         assert_eq!(
-            comment.span_content(),
+            result.span_content(),
             "  # This is a test\n ",
             "[2] The content is incorrect"
         );
@@ -105,30 +105,30 @@ mod test {
         let content = "# This is a test\n\n\r\n content";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Whitespace::parse(&mut input).expect("[3] The parser must succeed");
+        let result = Whitespace::parse(&mut input).expect("[3] The parser must succeed");
         assert_eq!(
-            comment.span_content(),
+            result.span_content(),
             "# This is a test\n\n\r\n ",
             "[3] The content is incorrect"
         );
     }
 
     #[test]
-    fn test_parse_incorrect() {
+    fn test_parse_error_not_found() {
         // Case 1: other element
         let context = ParserContext::default();
         let content = "identifier";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Whitespace::parse(&mut input).expect_err("[1] The parser must not succeed");
-        assert!(comment.is_not_found(), "[1] The error is incorrect");
+        let result = Whitespace::parse(&mut input).expect_err("[1] The parser must not succeed");
+        assert!(result.is_not_found(), "[1] The error is incorrect");
 
         // Case 2: empty
         let context = ParserContext::default();
         let content = "";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Whitespace::parse(&mut input).expect_err("[2] The parser must not succeed");
-        assert!(comment.is_not_found(), "[2] The error is incorrect");
+        let result = Whitespace::parse(&mut input).expect_err("[2] The parser must not succeed");
+        assert!(result.is_not_found(), "[2] The error is incorrect");
     }
 }

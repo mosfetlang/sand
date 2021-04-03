@@ -66,7 +66,7 @@ impl<'a> Comment<'a> {
     // STATIC METHODS -----–-----–-----–-----–-----–-----–-----–-----–-----–---
 
     /// Parses a single-line comment.
-    pub fn parse(input: &mut ParserInput<'a>) -> ParserResult<Comment<'a>> {
+    pub fn parse(input: &mut ParserInput<'a>) -> ParserResult<'a, Comment<'a>> {
         let init_cursor = input.save_cursor();
         let mut parser = map_result(
             verify(
@@ -116,14 +116,14 @@ mod test {
         let content = "# This is a test  ";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Comment::parse(&mut input).expect("[1] The parser must succeed");
+        let result = Comment::parse(&mut input).expect("[1] The parser must succeed");
         assert_eq!(
-            comment.span_content(),
+            result.span_content(),
             content,
             "[1] The content is incorrect"
         );
         assert_eq!(
-            comment.message(),
+            result.message(),
             "This is a test",
             "[1] The message is incorrect"
         );
@@ -133,14 +133,14 @@ mod test {
         let content = "# This is a test\n content";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Comment::parse(&mut input).expect("[2] The parser must succeed");
+        let result = Comment::parse(&mut input).expect("[2] The parser must succeed");
         assert_eq!(
-            comment.span_content(),
+            result.span_content(),
             "# This is a test",
             "[2] The content is incorrect"
         );
         assert_eq!(
-            comment.message(),
+            result.message(),
             "This is a test",
             "[2] The message is incorrect"
         );
@@ -150,40 +150,40 @@ mod test {
         let content = "#";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Comment::parse(&mut input).expect("[3] The parser must succeed");
-        assert_eq!(comment.span_content(), "#", "[3] The content is incorrect");
-        assert_eq!(comment.message(), "", "[3] The message is incorrect");
+        let result = Comment::parse(&mut input).expect("[3] The parser must succeed");
+        assert_eq!(result.span_content(), "#", "[3] The content is incorrect");
+        assert_eq!(result.message(), "", "[3] The message is incorrect");
 
         // Case 4: blank
         let context = ParserContext::default();
         let content = "#  \t  ";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Comment::parse(&mut input).expect("[4] The parser must succeed");
+        let result = Comment::parse(&mut input).expect("[4] The parser must succeed");
         assert_eq!(
-            comment.span_content(),
+            result.span_content(),
             "#  \t  ",
             "[4] The content is incorrect"
         );
-        assert_eq!(comment.message(), "", "[4] The message is incorrect");
+        assert_eq!(result.message(), "", "[4] The message is incorrect");
     }
 
     #[test]
-    fn test_parse_incorrect() {
+    fn test_parse_error_not_found() {
         // Case 1: other format
         let context = ParserContext::default();
         let content = "#[tag]";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Comment::parse(&mut input).expect_err("[1] The parser must not succeed");
-        assert!(comment.is_not_found(), "[1] The error is incorrect");
+        let result = Comment::parse(&mut input).expect_err("[1] The parser must not succeed");
+        assert!(result.is_not_found(), "[1] The error is incorrect");
 
         // Case 2: empty
         let context = ParserContext::default();
         let content = "";
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
-        let comment = Comment::parse(&mut input).expect_err("[2] The parser must not succeed");
-        assert!(comment.is_not_found(), "[2] The error is incorrect");
+        let result = Comment::parse(&mut input).expect_err("[2] The parser must not succeed");
+        assert!(result.is_not_found(), "[2] The error is incorrect");
     }
 }
