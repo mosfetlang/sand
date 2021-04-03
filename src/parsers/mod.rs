@@ -10,7 +10,7 @@ mod config;
 mod constants;
 mod context;
 mod errors;
-pub mod literals;
+pub mod expressions;
 mod traits;
 mod utils;
 mod warnings;
