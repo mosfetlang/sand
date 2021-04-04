@@ -4,9 +4,9 @@ use jpar::characters::{read_any_of, read_any_of0};
 use jpar::helpers::map_result;
 use jpar::sequence::tuple_ignore;
 use jpar::verifiers::interval_verifier;
-use jpar::Span;
+use jpar::{ParserResultError, Span};
 
-use crate::parsers::{ParserInput, ParserNode, ParserResult};
+use crate::parsers::{ParserError, ParserInput, ParserNode, ParserResult};
 
 // This classification is based on Swift's.
 pub static HEAD_CHARS: &[RangeInclusive<char>] = &[
@@ -119,6 +119,21 @@ impl<'a> Identifier<'a> {
         );
 
         parser(input)
+    }
+
+    /// Reads a keyword ensuring it does not belong to other words.
+    ///
+    /// For example: this parser matches 'key' in 'key' but not in 'keyword'.
+    pub fn read_keyword(input: &mut ParserInput<'a>, keyword: &str) -> ParserResult<'a, ()> {
+        let init_cursor = input.save_cursor();
+        let id = Self::parse(input)?;
+
+        if id.span_content() == keyword {
+            Ok(())
+        } else {
+            input.restore(init_cursor);
+            Err(ParserResultError::NotFound)
+        }
     }
 }
 
