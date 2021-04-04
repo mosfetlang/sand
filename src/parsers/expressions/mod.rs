@@ -1,11 +1,13 @@
 use jpar::branch::alternative;
 use jpar::helpers::map_result;
 use jpar::Span;
+pub use module_path::*;
 
 use crate::parsers::expressions::literals::Literal;
 use crate::parsers::{ParserInput, ParserNode, ParserResult};
 
 pub mod literals;
+mod module_path;
 
 /// An expression.
 #[derive(Debug, Clone, Eq, PartialEq)]

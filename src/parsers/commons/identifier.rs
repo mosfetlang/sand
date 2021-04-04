@@ -6,7 +6,7 @@ use jpar::sequence::tuple_ignore;
 use jpar::verifiers::interval_verifier;
 use jpar::{ParserResultError, Span};
 
-use crate::parsers::{ParserError, ParserInput, ParserNode, ParserResult};
+use crate::parsers::{ParserInput, ParserNode, ParserResult};
 
 // This classification is based on Swift's.
 pub static HEAD_CHARS: &[RangeInclusive<char>] = &[
@@ -124,6 +124,7 @@ impl<'a> Identifier<'a> {
     /// Reads a keyword ensuring it does not belong to other words.
     ///
     /// For example: this parser matches 'key' in 'key' but not in 'keyword'.
+    #[allow(clippy::result_unit_err)]
     pub fn read_keyword(input: &mut ParserInput<'a>, keyword: &str) -> ParserResult<'a, ()> {
         let init_cursor = input.save_cursor();
         let id = Self::parse(input)?;
