@@ -56,9 +56,6 @@ impl<'a> ParserNode<'a> for Expression<'a> {
 
 #[cfg(test)]
 mod test {
-    use num_bigint::BigInt;
-    use num_rational::BigRational;
-
     use crate::parsers::ParserContext;
 
     use super::*;
@@ -72,15 +69,5 @@ mod test {
         let result = Expression::parse(&mut input).expect("The parser must succeed");
         assert_eq!(result.span_content(), content, "The content is incorrect");
         assert!(result.is_literal(), "The type of expression is incorrect");
-
-        let result = result.unwrap_literal();
-        assert!(result.is_number(), "The type of literal is incorrect");
-
-        let result = result.unwrap_number();
-        assert_eq!(
-            result.value(),
-            &BigRational::from(BigInt::from(215_u64)),
-            "The value is incorrect"
-        );
     }
 }
