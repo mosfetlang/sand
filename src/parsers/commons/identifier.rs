@@ -124,7 +124,6 @@ impl<'a> Identifier<'a> {
     /// Reads a keyword ensuring it does not belong to other words.
     ///
     /// For example: this parser matches 'key' in 'key' but not in 'keyword'.
-    #[allow(clippy::result_unit_err)]
     pub fn read_keyword(
         keyword: &'a str,
     ) -> impl FnMut(&mut ParserInput<'a>) -> ParserResult<'a, ()> {

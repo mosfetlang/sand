@@ -18,4 +18,7 @@ pub enum ParserErrorKind {
     ConstDeclarationWithoutIdentifier,
     ConstDeclarationWithoutAssignExpression,
     ConstDeclarationWithoutExpression,
+
+    ModuleTwoStatementsInline,
+    ModuleUnrecognizedEOF,
 }
