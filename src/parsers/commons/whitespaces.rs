@@ -1,6 +1,6 @@
-use jpar::branch::alternative;
+use jpar::branch::alternative_ignore;
 use jpar::characters::ucd_whitespace1;
-use jpar::helpers::{ignore_result, map_result};
+use jpar::helpers::map_result;
 use jpar::sequence::repeat_and_count;
 use jpar::Span;
 
@@ -42,13 +42,7 @@ impl<'a> Whitespace<'a> {
     pub fn parse(input: &mut ParserInput<'a>) -> ParserResult<'a, Whitespace<'a>> {
         let init_cursor = input.save_cursor();
         let mut parser = map_result(
-            repeat_and_count(
-                1..,
-                alternative((
-                    ignore_result(ucd_whitespace1),
-                    ignore_result(Comment::parse),
-                )),
-            ),
+            repeat_and_count(1.., alternative_ignore((ucd_whitespace1, Comment::parse))),
             |input, _| Whitespace {
                 span: input.substring_to_current(&init_cursor),
             },

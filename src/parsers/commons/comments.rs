@@ -1,8 +1,10 @@
-use jpar::characters::{read_none_of0, read_text, ucd_single_line_whitespace0};
+use jpar::characters::{
+    read_none_of0, read_text, ucd_inline_whitespace0, UCD_LINE_BREAK_WHITESPACE_CHARS,
+};
 use jpar::combinator::verify;
 use jpar::helpers::map_result;
 use jpar::sequence::{preceded, tuple};
-use jpar::verifiers::char_verifier;
+use jpar::verifiers::interval_verifier;
 use jpar::Span;
 
 use crate::parsers::{ParserInput, ParserNode, ParserResult};
@@ -73,8 +75,8 @@ impl<'a> Comment<'a> {
                 preceded(
                     read_text(COMMENT_START_TOKEN),
                     tuple((
-                        ucd_single_line_whitespace0,
-                        read_none_of0(char_verifier('\n')),
+                        ucd_inline_whitespace0,
+                        read_none_of0(interval_verifier(UCD_LINE_BREAK_WHITESPACE_CHARS)),
                     )),
                 ),
                 |_, (ws, content)| content.is_empty() || ws.len() == 1,
