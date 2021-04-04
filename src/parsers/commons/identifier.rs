@@ -125,15 +125,19 @@ impl<'a> Identifier<'a> {
     ///
     /// For example: this parser matches 'key' in 'key' but not in 'keyword'.
     #[allow(clippy::result_unit_err)]
-    pub fn read_keyword(input: &mut ParserInput<'a>, keyword: &str) -> ParserResult<'a, ()> {
-        let init_cursor = input.save_cursor();
-        let id = Self::parse(input)?;
+    pub fn read_keyword(
+        keyword: &'a str,
+    ) -> impl FnMut(&mut ParserInput<'a>) -> ParserResult<'a, ()> {
+        move |input| {
+            let init_cursor = input.save_cursor();
+            let id = Self::parse(input)?;
 
-        if id.span_content() == keyword {
-            Ok(())
-        } else {
-            input.restore(init_cursor);
-            Err(ParserResultError::NotFound)
+            if id.span_content() == keyword {
+                Ok(())
+            } else {
+                input.restore(init_cursor);
+                Err(ParserResultError::NotFound)
+            }
         }
     }
 }
@@ -221,6 +225,31 @@ mod test {
         let mut input = ParserInput::new_with_context_and_error(content, context);
 
         let result = Identifier::parse(&mut input).expect_err("[2] The parser must not succeed");
+        assert!(result.is_not_found(), "[2] The error is incorrect");
+    }
+
+    #[test]
+    fn test_read_keyword() {
+        // Case 1: ok
+        let context = ParserContext::default();
+        let content = "const x";
+        let mut input = ParserInput::new_with_context_and_error(content, context);
+
+        let mut parser = Identifier::read_keyword("const");
+        let _ = parser(&mut input).expect("[1] The parser must succeed");
+        assert_eq!(
+            input.byte_offset(),
+            "const".len(),
+            "[1] The byte_offset is incorrect"
+        );
+
+        // Case 2: nok
+        let context = ParserContext::default();
+        let content = "constant";
+        let mut input = ParserInput::new_with_context_and_error(content, context);
+
+        let mut parser = Identifier::read_keyword("const");
+        let result = parser(&mut input).expect_err("[2] The parser must not succeed");
         assert!(result.is_not_found(), "[2] The error is incorrect");
     }
 }

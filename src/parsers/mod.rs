@@ -1,7 +1,6 @@
 pub use config::*;
 pub use context::*;
 pub use errors::*;
-use jpar::Reader;
 pub use traits::*;
 pub use warnings::*;
 
@@ -11,9 +10,10 @@ mod constants;
 mod context;
 mod errors;
 pub mod expressions;
+pub mod statements;
 mod traits;
 mod utils;
 mod warnings;
 
-pub type ParserInput<'a> = Reader<'a, ParserError<'a>, ParserContext<'a>>;
+pub type ParserInput<'a> = jpar::ParserInput<'a, ParserError<'a>, ParserContext<'a>>;
 pub type ParserResult<'a, T> = jpar::ParserResult<T, ParserError<'a>>;

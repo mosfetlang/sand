@@ -14,4 +14,8 @@ pub enum ParserErrorKind {
     NumberWithoutDigitsAfterExponentToken,
     NumberTooBig,
     NumberTooBigExponent,
+
+    ConstDeclarationWithoutIdentifier,
+    ConstDeclarationWithoutAssignExpression,
+    ConstDeclarationWithoutExpression,
 }
