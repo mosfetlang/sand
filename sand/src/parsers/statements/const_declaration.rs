@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::fmt::{Display, Formatter};
 
 use doclog::Color;
 use jpar::characters::read_text;
@@ -222,6 +223,19 @@ impl<'a> ConstDeclaration<'a> {
                     )
                 })
             },
+        )
+    }
+}
+
+impl<'a> Display for ConstDeclaration<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{} {} {} {}",
+            CONST_DECLARATION_KEYWORD,
+            self.identifier,
+            CONST_DECLARATION_ASSIGN_OPERATOR,
+            self.expression
         )
     }
 }

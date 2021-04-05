@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use std::ops::RangeInclusive;
 
 use jpar::characters::{read_any_of, read_any_of0};
@@ -138,6 +139,12 @@ impl<'a> Identifier<'a> {
                 Err(ParserResultError::NotFound)
             }
         }
+    }
+}
+
+impl<'a> Display for Identifier<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.span_content())
     }
 }
 

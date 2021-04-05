@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 use jpar::characters::read_text;
 use jpar::helpers::map_result;
 use jpar::sequence::{repeat_and_count, tuple_ignore};
@@ -59,6 +61,12 @@ impl<'a> ModulePath<'a> {
         );
 
         parser(input)
+    }
+}
+
+impl<'a> Display for ModulePath<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.span.content())
     }
 }
 

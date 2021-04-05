@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use std::option::Option::Some;
 
 use num_bigint::BigInt;
@@ -454,6 +455,12 @@ impl<'a> Number<'a> {
                 },
             );
         }
+    }
+}
+
+impl<'a> Display for Number<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.value().to_string())
     }
 }
 

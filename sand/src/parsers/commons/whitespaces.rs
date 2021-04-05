@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 use jpar::branch::alternative_ignore;
 use jpar::characters::ucd_whitespace1;
 use jpar::helpers::map_result;
@@ -25,6 +27,12 @@ impl<'a> Whitespace<'a> {
         Whitespace { span }
     }
 
+    // GETTERS -----–-----–-----–-----–-----–-----–-----–-----–-----–-----–----
+
+    pub fn is_multiline(&self) -> bool {
+        self.span.start_cursor().line() != self.span.end_cursor().line()
+    }
+
     // SETTERS -----–-----–-----–-----–-----–-----–-----–-----–-----–-----–----
 
     /// Sets the span of the node without checking it.
@@ -49,6 +57,16 @@ impl<'a> Whitespace<'a> {
         );
 
         parser(input)
+    }
+}
+
+impl<'a> Display for Whitespace<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if self.is_multiline() {
+            writeln!(f)
+        } else {
+            write!(f, " ")
+        }
     }
 }
 

@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 pub use const_declaration::*;
 use jpar::branch::alternative;
 use jpar::helpers::map_result;
@@ -39,6 +41,14 @@ impl<'a> Statement<'a> {
         }),));
 
         parser(input)
+    }
+}
+
+impl<'a> Display for Statement<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            Statement::ConstDeclaration(v) => v.fmt(f),
+        }
     }
 }
 

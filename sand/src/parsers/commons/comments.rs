@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 use jpar::characters::{read_none_of0, read_text, UCD_LINE_BREAK_WHITESPACE_CHARS};
 use jpar::combinator::verify;
 use jpar::helpers::map_result;
@@ -91,6 +93,12 @@ impl<'a> Comment<'a> {
     fn check_span(span: &Span<'a>) -> bool {
         let content = span.content();
         content.starts_with(COMMENT_START_TOKEN)
+    }
+}
+
+impl<'a> Display for Comment<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}{}", COMMENT_START_TOKEN, self.message())
     }
 }
 

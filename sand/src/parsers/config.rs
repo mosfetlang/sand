@@ -1,5 +1,5 @@
 /// The configuration to ignore some types of warnings.
-#[derive(Debug)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct ParserIgnoreConfig {
     pub number_leading_zeroes: bool,
     pub number_trailing_zeroes: bool,

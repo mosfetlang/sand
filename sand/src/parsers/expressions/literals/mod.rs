@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 use jpar::branch::alternative;
 use jpar::helpers::map_result;
 use jpar::Span;
@@ -38,6 +40,14 @@ impl<'a> Literal<'a> {
             alternative((map_result(Number::parse_decimal, |_, v| Literal::Number(v)),));
 
         parser(input)
+    }
+}
+
+impl<'a> Display for Literal<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            Literal::Number(v) => v.fmt(f),
+        }
     }
 }
 

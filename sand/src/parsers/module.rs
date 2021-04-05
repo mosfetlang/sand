@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 use doclog::Color;
 use jpar::combinator::{end, optional};
 use jpar::helpers::{and_then, ensure, error, map_result};
@@ -151,6 +153,16 @@ impl<'a> Module<'a> {
                 })
             },
         )
+    }
+}
+
+impl<'a> Display for Module<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        for statement in self.statements() {
+            writeln!(f, "{}", statement)?;
+        }
+
+        Ok(())
     }
 }
 

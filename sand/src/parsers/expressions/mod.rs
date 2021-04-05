@@ -1,3 +1,5 @@
+use std::fmt::{Display, Formatter};
+
 use jpar::branch::alternative;
 use jpar::helpers::map_result;
 use jpar::Span;
@@ -39,6 +41,14 @@ impl<'a> Expression<'a> {
         let mut parser = alternative((map_result(Literal::parse, |_, v| Expression::Literal(v)),));
 
         parser(input)
+    }
+}
+
+impl<'a> Display for Expression<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            Expression::Literal(v) => v.fmt(f),
+        }
     }
 }
 
