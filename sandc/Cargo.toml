@@ -1,8 +1,11 @@
 [package]
 name = "sandc"
 version = "0.1.0"
-authors = ["Julio Treviño Páez <jtrevino@naevatec.com>"]
+authors = ["Julio Treviño Páez <julio.tpaez@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+clap = "3.0.0-beta.2"
+log = "0.4.14"
+pretty_env_logger = "0.4.0"
 sand = { version = "0.1.0", path = "../sand" }
