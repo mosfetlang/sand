@@ -1,0 +1,8 @@
+[package]
+name = "sandc"
+version = "0.1.0"
+authors = ["Julio Treviño Páez <jtrevino@naevatec.com>"]
+edition = "2018"
+
+[dependencies]
+sand = { version = "0.1.0", path = "../sand" }
