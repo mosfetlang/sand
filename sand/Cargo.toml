@@ -4,6 +4,12 @@ version = "0.1.0"
 authors = ["Julio Treviño Páez <julio.tpaez@gmail.com>"]
 edition = "2018"
 
+[features]
+default = ["parser", "compiler"]
+parser = []
+compiler = []
+vm = []
+
 [dependencies]
 doclog = { version = "0.1.0", path = "../../doclog" }
 jpar = { version = "0.1.0", path = "../../jpar", features = ["alloc"] }
