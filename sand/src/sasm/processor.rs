@@ -2,14 +2,10 @@ use std::convert::TryInto;
 
 use crate::sasm::{Action, Memory, Program, MEMORY_DEFAULT_PAGE_SIZE, MEMORY_DEFAULT_STACK_SIZE};
 
-/// The default number of registers: 64 (6 bits)
-pub const PROCESSOR_DEFAULT_REGISTERS: usize = 64;
-
 /// A VM processor that carries with memory, registers, etc.
 pub struct Processor {
     memory: Memory,
     program: Program,
-    registers: Vec<u64>,
     program_counter: usize,
     stack_pointer: usize,
     stack_size: usize,
@@ -19,12 +15,7 @@ pub struct Processor {
 impl Processor {
     // CONSTRUCTORS -----------------------------------------------------------
 
-    pub fn new(
-        memory: Memory,
-        program: Program,
-        registers: Vec<u64>,
-        stack_size: usize,
-    ) -> Processor {
+    pub fn new(memory: Memory, program: Program, stack_size: usize) -> Processor {
         assert!(
             stack_size <= memory.size(),
             "The stack size({}) must be lower or equal than the memory size({})",
@@ -35,7 +26,6 @@ impl Processor {
         Processor {
             memory,
             program,
-            registers,
             program_counter: 0,
             stack_pointer: 0,
             stack_size,
@@ -43,7 +33,7 @@ impl Processor {
         }
     }
 
-    pub fn new_empty(program: Program, number_of_registers: usize, stack_size: usize) -> Processor {
+    pub fn new_empty(program: Program, stack_size: usize) -> Processor {
         assert_eq!(
             stack_size % MEMORY_DEFAULT_PAGE_SIZE,
             0,
@@ -60,7 +50,6 @@ impl Processor {
         Processor {
             memory,
             program,
-            registers: vec![0; number_of_registers],
             program_counter: 0,
             stack_pointer: 0,
             stack_size,
@@ -83,16 +72,6 @@ impl Processor {
     #[inline]
     pub fn program(&self) -> &Program {
         &self.program
-    }
-
-    #[inline]
-    pub fn registers(&self) -> &Vec<u64> {
-        &self.registers
-    }
-
-    #[inline]
-    pub fn registers_mut(&mut self) -> &mut Vec<u64> {
-        &mut self.registers
     }
 
     #[inline]
@@ -149,106 +128,6 @@ impl Processor {
     }
 
     // METHODS ----------------------------------------------------------------
-
-    pub fn read_u8_register_at(&self, index: usize) -> Result<u8, Action> {
-        let bytes = &self.read_u64_register_at(index)?.to_le_bytes();
-        Ok(bytes[7])
-    }
-
-    pub fn read_u16_register_at(&self, index: usize) -> Result<u16, Action> {
-        let bytes = &self.read_u64_register_at(index)?.to_le_bytes()[6..];
-        Ok(u16::from_le_bytes(bytes.try_into().unwrap()))
-    }
-
-    pub fn read_u32_register_at(&self, index: usize) -> Result<u32, Action> {
-        let bytes = &self.read_u64_register_at(index)?.to_le_bytes()[4..];
-        Ok(u32::from_le_bytes(bytes.try_into().unwrap()))
-    }
-
-    pub fn read_u64_register_at(&self, index: usize) -> Result<u64, Action> {
-        match self.registers.get(index) {
-            Some(v) => Ok(*v),
-            None => Err(Action::Panic("Register out of bounds")),
-        }
-    }
-
-    pub fn read_i8_register_at(&self, index: usize) -> Result<i8, Action> {
-        let bytes = &self.read_u64_register_at(index)?.to_le_bytes()[7..];
-        Ok(i8::from_le_bytes(bytes.try_into().unwrap()))
-    }
-
-    pub fn read_i16_register_at(&self, index: usize) -> Result<i16, Action> {
-        let bytes = &self.read_u64_register_at(index)?.to_le_bytes()[6..];
-        Ok(i16::from_le_bytes(bytes.try_into().unwrap()))
-    }
-
-    pub fn read_i32_register_at(&self, index: usize) -> Result<i32, Action> {
-        let bytes = &self.read_u64_register_at(index)?.to_le_bytes()[4..];
-        Ok(i32::from_le_bytes(bytes.try_into().unwrap()))
-    }
-
-    pub fn read_i64_register_at(&self, index: usize) -> Result<i64, Action> {
-        let bytes = &self.read_u64_register_at(index)?.to_le_bytes()[..];
-        Ok(i64::from_le_bytes(bytes.try_into().unwrap()))
-    }
-
-    pub fn read_f32_register_at(&self, index: usize) -> Result<f32, Action> {
-        let bytes = &self.read_u64_register_at(index)?.to_le_bytes()[4..];
-        Ok(f32::from_le_bytes(bytes.try_into().unwrap()))
-    }
-
-    pub fn read_f64_register_at(&self, index: usize) -> Result<f64, Action> {
-        let bytes = &self.read_u64_register_at(index)?.to_le_bytes()[..];
-        Ok(f64::from_le_bytes(bytes.try_into().unwrap()))
-    }
-
-    pub fn write_u8_register_at(&mut self, index: usize, value: u8) -> Result<(), Action> {
-        self.write_u64_register_at(index, value as u64)
-    }
-
-    pub fn write_u16_register_at(&mut self, index: usize, value: u16) -> Result<(), Action> {
-        self.write_u64_register_at(index, value as u64)
-    }
-
-    pub fn write_u32_register_at(&mut self, index: usize, value: u32) -> Result<(), Action> {
-        self.write_u64_register_at(index, value as u64)
-    }
-
-    pub fn write_u64_register_at(&mut self, index: usize, value: u64) -> Result<(), Action> {
-        match self.registers.get_mut(index) {
-            Some(v) => {
-                *v = value;
-                Ok(())
-            }
-            None => Err(Action::Panic("Register out of bounds")),
-        }
-    }
-
-    pub fn write_i8_register_at(&mut self, index: usize, value: u8) -> Result<(), Action> {
-        self.write_i64_register_at(index, value as i64)
-    }
-
-    pub fn write_i16_register_at(&mut self, index: usize, value: u16) -> Result<(), Action> {
-        self.write_i64_register_at(index, value as i64)
-    }
-
-    pub fn write_i32_register_at(&mut self, index: usize, value: u32) -> Result<(), Action> {
-        self.write_i64_register_at(index, value as i64)
-    }
-
-    pub fn write_i64_register_at(&mut self, index: usize, value: i64) -> Result<(), Action> {
-        let bytes = &value.to_le_bytes()[..];
-        self.write_u64_register_at(index, u64::from_le_bytes(bytes.try_into().unwrap()))
-    }
-
-    pub fn write_f32_register_at(&mut self, index: usize, value: f32) -> Result<(), Action> {
-        self.write_f64_register_at(index, value as f64)
-    }
-
-    pub fn write_f64_register_at(&mut self, index: usize, value: f64) -> Result<(), Action> {
-        let bytes = &value.to_le_bytes()[..];
-        self.write_u64_register_at(index, u64::from_le_bytes(bytes.try_into().unwrap()))
-    }
 
     pub fn pop_u8(&mut self) -> Result<u8, Action> {
         let value = self.peek_u8()?;
