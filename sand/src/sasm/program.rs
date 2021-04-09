@@ -18,6 +18,15 @@ impl Program {
         }
     }
 
+    #[cfg(test)]
+    pub fn new_for_tests(program: Vec<u8>, data_pointer: usize, code_pointer: usize) -> Program {
+        Program {
+            program,
+            data_pointer,
+            code_pointer,
+        }
+    }
+
     // GETTERS ----------------------------------------------------------------
 
     #[inline]
@@ -59,7 +68,7 @@ impl Program {
             return Err(Action::Panic("Segmentation Fault"));
         }
 
-        bytes[..(last_index - index)].clone_from_slice(&self.program[index..last_index]);
+        bytes[..].clone_from_slice(&self.program[index..last_index]);
 
         Ok(())
     }
@@ -141,6 +150,8 @@ impl Program {
 
 #[cfg(test)]
 mod test {
+    use std::convert::TryInto;
+
     use super::*;
 
     #[test]

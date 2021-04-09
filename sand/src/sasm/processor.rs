@@ -32,18 +32,13 @@ impl Processor {
     }
 
     pub fn new_empty(program: Program, stack_size: usize) -> Processor {
-        assert_eq!(
-            stack_size % MEMORY_DEFAULT_PAGE_SIZE,
-            0,
-            "The stack size({}) must be a multiple of the page size({})",
-            stack_size,
-            MEMORY_DEFAULT_PAGE_SIZE
-        );
+        let mut stack_pages = stack_size / MEMORY_DEFAULT_PAGE_SIZE;
+        if stack_size % MEMORY_DEFAULT_PAGE_SIZE != 0 {
+            stack_pages += 1;
+        }
 
         let mut memory = Memory::new_empty(MEMORY_DEFAULT_PAGE_SIZE, usize::MAX);
-        memory
-            .add_empty_pages(stack_size / MEMORY_DEFAULT_PAGE_SIZE)
-            .unwrap();
+        memory.add_empty_pages(stack_pages).unwrap();
 
         Processor {
             memory,
@@ -106,7 +101,7 @@ impl Processor {
 
     #[inline]
     pub fn set_program_counter(&mut self, program_counter: usize) -> Result<(), Action> {
-        if program_counter >= self.program().data_pointer_end() {
+        if program_counter >= self.program().code_pointer_end() {
             return Err(Action::Panic("Code Segmentation Fault"));
         }
 
@@ -114,15 +109,13 @@ impl Processor {
         Ok(())
     }
 
-    /// # Safety
-    ///
-    /// This method will panic if the stack_pointer is outside the stack memory.
-    pub fn set_stack_pointer(&mut self, stack_pointer: usize) {
+    pub fn set_stack_pointer(&mut self, stack_pointer: usize) -> Result<(), Action> {
         if stack_pointer >= self.stack_size {
-            panic!("Stack overflow")
+            return Err(Action::Panic("Stack Overflow"));
         }
 
         self.stack_pointer = stack_pointer;
+        Ok(())
     }
 
     #[inline]
@@ -195,7 +188,7 @@ impl Processor {
     pub fn push_u8(&mut self, value: u8) -> Result<(), Action> {
         let num_bytes = std::mem::size_of::<u8>();
         if self.stack_pointer + num_bytes > self.stack_size {
-            return Err(Action::Panic("Stack overflow"));
+            return Err(Action::Panic("Stack Overflow"));
         }
 
         self.memory.write_u8_at(self.stack_pointer, value)?;
@@ -207,7 +200,7 @@ impl Processor {
     pub fn push_u16(&mut self, value: u16) -> Result<(), Action> {
         let num_bytes = std::mem::size_of::<u16>();
         if self.stack_pointer + num_bytes > self.stack_size {
-            return Err(Action::Panic("Stack overflow"));
+            return Err(Action::Panic("Stack Overflow"));
         }
 
         self.memory.write_u16_at(self.stack_pointer, value)?;
@@ -219,7 +212,7 @@ impl Processor {
     pub fn push_u32(&mut self, value: u32) -> Result<(), Action> {
         let num_bytes = std::mem::size_of::<u32>();
         if self.stack_pointer + num_bytes > self.stack_size {
-            return Err(Action::Panic("Stack overflow"));
+            return Err(Action::Panic("Stack Overflow"));
         }
 
         self.memory.write_u32_at(self.stack_pointer, value)?;
@@ -231,7 +224,7 @@ impl Processor {
     pub fn push_u64(&mut self, value: u64) -> Result<(), Action> {
         let num_bytes = std::mem::size_of::<u64>();
         if self.stack_pointer + num_bytes > self.stack_size {
-            return Err(Action::Panic("Stack overflow"));
+            return Err(Action::Panic("Stack Overflow"));
         }
 
         self.memory.write_u64_at(self.stack_pointer, value)?;
@@ -243,7 +236,7 @@ impl Processor {
     pub fn push_i8(&mut self, value: i8) -> Result<(), Action> {
         let num_bytes = std::mem::size_of::<i8>();
         if self.stack_pointer + num_bytes > self.stack_size {
-            return Err(Action::Panic("Stack overflow"));
+            return Err(Action::Panic("Stack Overflow"));
         }
 
         self.memory.write_i8_at(self.stack_pointer, value)?;
@@ -255,7 +248,7 @@ impl Processor {
     pub fn push_i16(&mut self, value: i16) -> Result<(), Action> {
         let num_bytes = std::mem::size_of::<i16>();
         if self.stack_pointer + num_bytes > self.stack_size {
-            return Err(Action::Panic("Stack overflow"));
+            return Err(Action::Panic("Stack Overflow"));
         }
 
         self.memory.write_i16_at(self.stack_pointer, value)?;
@@ -267,7 +260,7 @@ impl Processor {
     pub fn push_i32(&mut self, value: i32) -> Result<(), Action> {
         let num_bytes = std::mem::size_of::<i32>();
         if self.stack_pointer + num_bytes > self.stack_size {
-            return Err(Action::Panic("Stack overflow"));
+            return Err(Action::Panic("Stack Overflow"));
         }
 
         self.memory.write_i32_at(self.stack_pointer, value)?;
@@ -279,7 +272,7 @@ impl Processor {
     pub fn push_i64(&mut self, value: i64) -> Result<(), Action> {
         let num_bytes = std::mem::size_of::<i64>();
         if self.stack_pointer + num_bytes > self.stack_size {
-            return Err(Action::Panic("Stack overflow"));
+            return Err(Action::Panic("Stack Overflow"));
         }
 
         self.memory.write_i64_at(self.stack_pointer, value)?;
@@ -291,7 +284,7 @@ impl Processor {
     pub fn push_f32(&mut self, value: f32) -> Result<(), Action> {
         let num_bytes = std::mem::size_of::<f32>();
         if self.stack_pointer + num_bytes > self.stack_size {
-            return Err(Action::Panic("Stack overflow"));
+            return Err(Action::Panic("Stack Overflow"));
         }
 
         self.memory.write_f32_at(self.stack_pointer, value)?;
@@ -303,7 +296,7 @@ impl Processor {
     pub fn push_f64(&mut self, value: f64) -> Result<(), Action> {
         let num_bytes = std::mem::size_of::<f64>();
         if self.stack_pointer + num_bytes > self.stack_size {
-            return Err(Action::Panic("Stack overflow"));
+            return Err(Action::Panic("Stack Overflow"));
         }
 
         self.memory.write_f64_at(self.stack_pointer, value)?;

@@ -114,9 +114,8 @@ impl Memory {
 
     fn read_at_single_page(&self, page_index: usize, index_in_page: usize, bytes: &mut [u8]) {
         let page = &self.pages[page_index];
-        let bytes_range = ..(bytes.len() - index_in_page);
-        let page_range = index_in_page..bytes.len();
-        bytes[bytes_range].clone_from_slice(&page[page_range]);
+        let page_range = index_in_page..index_in_page + bytes.len();
+        bytes[..].clone_from_slice(&page[page_range]);
     }
 
     #[inline]
@@ -224,7 +223,7 @@ impl Memory {
 
     fn write_at_single_page(&mut self, page_index: usize, index_in_page: usize, bytes: &[u8]) {
         let page = &mut self.pages[page_index];
-        page[index_in_page..bytes.len()].clone_from_slice(&bytes[..(bytes.len() - index_in_page)]);
+        page[index_in_page..index_in_page + bytes.len()].clone_from_slice(&bytes);
     }
 
     #[inline]
