@@ -1,9 +1,11 @@
+pub use arithmetic::*;
 pub use general::*;
 pub use memory::*;
 pub use stack::*;
 
 use crate::sasm::{Action, Processor};
 
+mod arithmetic;
 mod general;
 mod memory;
 mod stack;
@@ -137,18 +139,18 @@ pub static INSTRUCTION_LIST: [fn(&mut Processor) -> Action; 256] = [
     unreachable,
     unreachable,
     unreachable,
-    unreachable, // 70
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable, // 80
-    unreachable,
+    extend_8_to_16, // 70
+    extend_8_to_32,
+    extend_16_to_32,
+    extend_8_to_64,
+    extend_16_to_64,
+    extend_32_to_64,
+    extend_sign_8_to_16,
+    extend_sign_8_to_32,
+    extend_sign_16_to_32,
+    extend_sign_8_to_64,
+    extend_sign_16_to_64, // 80
+    extend_sign_32_to_64,
     unreachable,
     unreachable,
     unreachable,
