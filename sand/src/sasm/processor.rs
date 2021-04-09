@@ -1,5 +1,3 @@
-use std::convert::TryInto;
-
 use crate::sasm::{Action, Memory, Program, MEMORY_DEFAULT_PAGE_SIZE, MEMORY_DEFAULT_STACK_SIZE};
 
 /// A VM processor that carries with memory, registers, etc.
@@ -407,5 +405,65 @@ impl Processor {
 
         let start_index = self.stack_pointer - num_bytes;
         self.memory.read_f64_at(start_index)
+    }
+
+    pub fn code_next_u8(&mut self) -> Result<u8, Action> {
+        let result = self.program.read_u8_at(self.program_counter)?;
+        self.program_counter += std::mem::size_of::<u8>();
+        Ok(result)
+    }
+
+    pub fn code_next_u16(&mut self) -> Result<u16, Action> {
+        let result = self.program.read_u16_at(self.program_counter)?;
+        self.program_counter += std::mem::size_of::<u16>();
+        Ok(result)
+    }
+
+    pub fn code_next_u32(&mut self) -> Result<u32, Action> {
+        let result = self.program.read_u32_at(self.program_counter)?;
+        self.program_counter += std::mem::size_of::<u32>();
+        Ok(result)
+    }
+
+    pub fn code_next_u64(&mut self) -> Result<u64, Action> {
+        let result = self.program.read_u64_at(self.program_counter)?;
+        self.program_counter += std::mem::size_of::<u64>();
+        Ok(result)
+    }
+
+    pub fn code_next_i8(&mut self) -> Result<i8, Action> {
+        let result = self.program.read_i8_at(self.program_counter)?;
+        self.program_counter += std::mem::size_of::<i8>();
+        Ok(result)
+    }
+
+    pub fn code_next_i16(&mut self) -> Result<i16, Action> {
+        let result = self.program.read_i16_at(self.program_counter)?;
+        self.program_counter += std::mem::size_of::<i16>();
+        Ok(result)
+    }
+
+    pub fn code_next_i32(&mut self) -> Result<i32, Action> {
+        let result = self.program.read_i32_at(self.program_counter)?;
+        self.program_counter += std::mem::size_of::<i32>();
+        Ok(result)
+    }
+
+    pub fn code_next_i64(&mut self) -> Result<i64, Action> {
+        let result = self.program.read_i64_at(self.program_counter)?;
+        self.program_counter += std::mem::size_of::<i64>();
+        Ok(result)
+    }
+
+    pub fn code_next_f32(&mut self) -> Result<f32, Action> {
+        let result = self.program.read_f32_at(self.program_counter)?;
+        self.program_counter += std::mem::size_of::<f32>();
+        Ok(result)
+    }
+
+    pub fn code_next_f64(&mut self) -> Result<f64, Action> {
+        let result = self.program.read_f64_at(self.program_counter)?;
+        self.program_counter += std::mem::size_of::<f64>();
+        Ok(result)
     }
 }

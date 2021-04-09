@@ -3,22 +3,53 @@ use std::convert::TryInto;
 use crate::sasm::Action;
 
 pub struct Program {
-    data: Vec<u8>,
+    program: Vec<u8>,
+    data_pointer: usize,
+    code_pointer: usize,
 }
 
 impl Program {
     // CONSTRUCTORS -----------------------------------------------------------
 
-    pub fn new(data: Vec<u8>) -> Program {
+    pub fn new(program: Vec<u8>) -> Program {
         // TODO improve reading the format and the different sections.
-        Program { data }
+        Program {
+            program,
+            data_pointer: 0,
+            code_pointer: 0,
+        }
     }
 
     // GETTERS ----------------------------------------------------------------
 
     #[inline]
+    pub fn program(&self) -> &Vec<u8> {
+        &self.program
+    }
+
+    #[inline]
     pub fn size(&self) -> usize {
-        self.data.len()
+        self.program.len()
+    }
+
+    #[inline]
+    pub fn data_pointer(&self) -> usize {
+        self.data_pointer
+    }
+
+    #[inline]
+    pub fn data_pointer_end(&self) -> usize {
+        self.code_pointer
+    }
+
+    #[inline]
+    pub fn code_pointer(&self) -> usize {
+        self.code_pointer
+    }
+
+    #[inline]
+    pub fn code_pointer_end(&self) -> usize {
+        self.size()
     }
 
     // METHODS ----------------------------------------------------------------
@@ -32,7 +63,7 @@ impl Program {
 
         let mut i = 0;
         for j in index..last_index {
-            bytes[i] = self.data[j];
+            bytes[i] = self.program[j];
             i += 1;
         }
 
@@ -198,12 +229,12 @@ mod test {
         assert_eq!(result, value, "[8] The value is incorrect");
 
         // f32
-        let value = f32::from_le_bytes(program.data[0..4].try_into().unwrap());
+        let value = f32::from_le_bytes(program.program[0..4].try_into().unwrap());
         let result = program.read_f32_at(0).expect("[9] The read must succeed");
         assert_eq!(result, value, "[9] The value is incorrect");
 
         // f64
-        let value = f64::from_le_bytes(program.data[..].try_into().unwrap());
+        let value = f64::from_le_bytes(program.program[..].try_into().unwrap());
         let result = program.read_f64_at(0).expect("[10] The read must succeed");
         assert_eq!(result, value, "[10] The value is incorrect");
     }

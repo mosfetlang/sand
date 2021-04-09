@@ -10,9 +10,41 @@ mod stack;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum Instruction {
+    // General
     Unreachable = 0,
     Nop,
     Debug,
+
+    // Memory
+    MemorySize = 12,
+    MemoryGrow,
+    MemoryFill8,
+    MemoryFill16,
+    MemoryFill32,
+    MemoryFill64,
+    MemoryCopy,
+    MemoryLoad8,
+    MemoryLoad16,
+    MemoryLoad32,
+    MemoryLoad64,
+    MemoryStore8,
+    MemoryStore16,
+    MemoryStore32,
+    MemoryStore64,
+    ProgramDataLoad8,
+    ProgramDataLoad16,
+    ProgramDataLoad32,
+    ProgramDataLoad64,
+
+    // Stack
+    Drop8 = 40,
+    Drop16,
+    Drop32,
+    Drop64,
+    Const8,
+    Const16,
+    Const32,
+    Const64,
 }
 
 impl Instruction {
@@ -32,7 +64,7 @@ pub static INSTRUCTION_LIST: [fn(&mut Processor) -> Action; 256] = [
     // General
     unreachable, // 0
     nop,
-    unreachable,
+    debug,
     unreachable,
     unreachable,
     unreachable,
@@ -44,40 +76,40 @@ pub static INSTRUCTION_LIST: [fn(&mut Processor) -> Action; 256] = [
     unreachable,
     memory_size,
     memory_grow,
+    memory_fill_8,
+    memory_fill_16,
+    memory_fill_32,
+    memory_fill_64,
+    memory_copy,
+    memory_load_8,
+    memory_load_16, // 20
+    memory_load_32,
+    memory_load_64,
+    memory_store_8,
+    memory_store_16,
+    memory_store_32,
+    memory_store_64,
+    program_data_load_8,
+    program_data_load_16,
+    program_data_load_32,
+    program_data_load_64, // 30
     unreachable,
     unreachable,
     unreachable,
     unreachable,
     unreachable,
     unreachable,
-    unreachable, // 20
     unreachable,
     unreachable,
     unreachable,
-    unreachable,
-    unreachable,
-    drop_8,
+    drop_8, // 40
     drop_16,
     drop_32,
     drop_64,
-    unreachable, // 30
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable, // 40
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
+    const_8,
+    const_16,
+    const_32,
+    const_64,
     unreachable,
     unreachable,
     unreachable, // 50
