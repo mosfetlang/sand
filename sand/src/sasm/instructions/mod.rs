@@ -14,6 +14,11 @@ pub enum Instruction {
     Unreachable = 0,
     Nop,
     Debug,
+    Branch,
+    BranchIf8,
+    BranchIf16,
+    BranchIf32,
+    BranchIf64,
 
     // Memory
     MemorySize = 12,
@@ -65,11 +70,11 @@ pub static INSTRUCTION_LIST: [fn(&mut Processor) -> Action; 256] = [
     unreachable, // 0
     nop,
     debug,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
+    branch,
+    branch_if_8,
+    branch_if_16,
+    branch_if_32,
+    branch_if_64,
     unreachable,
     unreachable,
     unreachable, // 10

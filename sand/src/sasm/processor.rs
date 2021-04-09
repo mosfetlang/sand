@@ -105,8 +105,13 @@ impl Processor {
     // SETTERS ----------------------------------------------------------------
 
     #[inline]
-    pub fn set_program_counter(&mut self, program_counter: usize) {
+    pub fn set_program_counter(&mut self, program_counter: usize) -> Result<(), Action> {
+        if code_position >= processor.program().data_pointer_end() {
+            return Err(Action::Panic("Code Segmentation Fault"));
+        }
+
         self.program_counter = program_counter;
+        Ok(())
     }
 
     /// # Safety
