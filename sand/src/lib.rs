@@ -1,6 +1,3 @@
-#[macro_use]
-mod macros;
-
 #[cfg(any(feature = "parser", feature = "compiler"))]
 pub mod parsers;
 

@@ -1,9 +1,6 @@
 /// The different actions that can occur in the VM.
 #[derive(Debug)]
 pub enum Action {
-    /// The execution is correct.
-    Ok,
-
     /// Stops the VM allowing to resume its execution.
     Halt,
 
@@ -13,10 +10,6 @@ pub enum Action {
 
 impl Action {
     // GETTERS ----------------------------------------------------------------
-
-    pub fn is_ok(&self) -> bool {
-        matches!(self, Action::Ok)
-    }
 
     pub fn is_halt(&self) -> bool {
         matches!(self, Action::Halt)

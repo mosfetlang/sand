@@ -4,10 +4,10 @@ use crate::sasm::{Action, Processor};
 ///
 /// Stack:
 /// + u32 - Memory size
-pub fn memory_size(processor: &mut Processor) -> Action {
+pub fn memory_size(processor: &mut Processor) -> Result<(), Action> {
     let memory_size = processor.memory().size() as u32;
-    unwrap_action!(processor.push_u32(memory_size));
-    Action::Ok
+    processor.push_u32(memory_size)?;
+    Ok(())
 }
 
 /// Expands the available memory of the system.
@@ -17,8 +17,8 @@ pub fn memory_size(processor: &mut Processor) -> Action {
 /// + u32 - Previous size.
 ///
 /// If it fails, the overflow_flag is set.
-pub fn memory_grow(processor: &mut Processor) -> Action {
-    let increase_amount = unwrap_action!(processor.pop_u32());
+pub fn memory_grow(processor: &mut Processor) -> Result<(), Action> {
+    let increase_amount = processor.pop_u32()?;
     let memory_size = processor.memory().size() as u32;
     let page_size = processor.memory().page_size() as u32;
     let mut pages = increase_amount / page_size;
@@ -31,9 +31,9 @@ pub fn memory_grow(processor: &mut Processor) -> Action {
         .add_empty_pages(pages as usize)
         .is_err();
     processor.set_overflow_flag(is_error);
-    unwrap_action!(processor.push_u32(memory_size));
+    processor.push_u32(memory_size)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Fills a region of the memory with the specified value of ?8.
@@ -43,18 +43,18 @@ pub fn memory_grow(processor: &mut Processor) -> Action {
 /// - u8  - The value to use to fill the memory.
 /// - u32 - Number of words.
 /// - u32 - Start pointer.
-pub fn memory_fill_8(processor: &mut Processor) -> Action {
-    let value = unwrap_action!(processor.pop_u8());
-    let number_of_words = unwrap_action!(processor.pop_u32()) as usize;
-    let start_pointer = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_fill_8(processor: &mut Processor) -> Result<(), Action> {
+    let value = processor.pop_u8()?;
+    let number_of_words = processor.pop_u32()? as usize;
+    let start_pointer = processor.pop_u32()? as usize;
 
     let memory = processor.memory_mut();
 
     for word in 0..number_of_words {
-        unwrap_action!(memory.write_u8_at(start_pointer + word, value));
+        memory.write_u8_at(start_pointer + word, value)?;
     }
 
-    Action::Ok
+    Ok(())
 }
 
 /// Fills a region of the memory with the specified value of ?16.
@@ -64,18 +64,18 @@ pub fn memory_fill_8(processor: &mut Processor) -> Action {
 /// - u16 - The value to use to fill the memory.
 /// - u32 - Number of words.
 /// - u32 - Start pointer.
-pub fn memory_fill_16(processor: &mut Processor) -> Action {
-    let value = unwrap_action!(processor.pop_u16());
-    let number_of_words = unwrap_action!(processor.pop_u32()) as usize;
-    let start_pointer = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_fill_16(processor: &mut Processor) -> Result<(), Action> {
+    let value = processor.pop_u16()?;
+    let number_of_words = processor.pop_u32()? as usize;
+    let start_pointer = processor.pop_u32()? as usize;
 
     let memory = processor.memory_mut();
 
     for word in 0..number_of_words {
-        unwrap_action!(memory.write_u16_at(start_pointer + word, value));
+        memory.write_u16_at(start_pointer + word, value)?;
     }
 
-    Action::Ok
+    Ok(())
 }
 
 /// Fills a region of the memory with the specified value of ?32.
@@ -85,18 +85,18 @@ pub fn memory_fill_16(processor: &mut Processor) -> Action {
 /// - u32 - The value to use to fill the memory.
 /// - u32 - Number of words.
 /// - u32 - Start pointer.
-pub fn memory_fill_32(processor: &mut Processor) -> Action {
-    let value = unwrap_action!(processor.pop_u32());
-    let number_of_words = unwrap_action!(processor.pop_u32()) as usize;
-    let start_pointer = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_fill_32(processor: &mut Processor) -> Result<(), Action> {
+    let value = processor.pop_u32()?;
+    let number_of_words = processor.pop_u32()? as usize;
+    let start_pointer = processor.pop_u32()? as usize;
 
     let memory = processor.memory_mut();
 
     for word in 0..number_of_words {
-        unwrap_action!(memory.write_u32_at(start_pointer + word, value));
+        memory.write_u32_at(start_pointer + word, value)?;
     }
 
-    Action::Ok
+    Ok(())
 }
 
 /// Fills a region of the memory with the specified value of ?64.
@@ -106,18 +106,18 @@ pub fn memory_fill_32(processor: &mut Processor) -> Action {
 /// - u64 - The value to use to fill the memory.
 /// - u32 - Number of words.
 /// - u32 - Start pointer.
-pub fn memory_fill_64(processor: &mut Processor) -> Action {
-    let value = unwrap_action!(processor.pop_u64());
-    let number_of_words = unwrap_action!(processor.pop_u32()) as usize;
-    let start_pointer = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_fill_64(processor: &mut Processor) -> Result<(), Action> {
+    let value = processor.pop_u64()?;
+    let number_of_words = processor.pop_u32()? as usize;
+    let start_pointer = processor.pop_u32()? as usize;
 
     let memory = processor.memory_mut();
 
     for word in 0..number_of_words {
-        unwrap_action!(memory.write_u64_at(start_pointer + word, value));
+        memory.write_u64_at(start_pointer + word, value)?;
     }
 
-    Action::Ok
+    Ok(())
 }
 
 /// Copies a region of memory into another one.
@@ -127,23 +127,23 @@ pub fn memory_fill_64(processor: &mut Processor) -> Action {
 /// - u32 - Target pointer.
 /// - u32 - Number of bytes.
 /// - u32 - Origin pointer.
-pub fn memory_copy(processor: &mut Processor) -> Action {
-    let target_pointer = unwrap_action!(processor.pop_u32()) as usize;
-    let number_of_bytes = unwrap_action!(processor.pop_u32()) as usize;
-    let origin_pointer = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_copy(processor: &mut Processor) -> Result<(), Action> {
+    let target_pointer = processor.pop_u32()? as usize;
+    let number_of_bytes = processor.pop_u32()? as usize;
+    let origin_pointer = processor.pop_u32()? as usize;
 
     if origin_pointer == target_pointer {
-        return Action::Ok;
+        return Ok(());
     }
 
     let memory = processor.memory_mut();
 
     for i in 0..number_of_bytes {
-        let value = unwrap_action!(memory.read_u8_at(origin_pointer + i));
-        unwrap_action!(memory.write_u8_at(target_pointer + i, value));
+        let value = memory.read_u8_at(origin_pointer + i)?;
+        memory.write_u8_at(target_pointer + i, value)?;
     }
 
-    Action::Ok
+    Ok(())
 }
 
 /// Loads a ?8 memory value and pushes it into the stack.
@@ -152,14 +152,14 @@ pub fn memory_copy(processor: &mut Processor) -> Action {
 /// Stack:
 /// - u32 - Memory position.
 /// + ?8  - Memory value.
-pub fn memory_load_8(processor: &mut Processor) -> Action {
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_load_8(processor: &mut Processor) -> Result<(), Action> {
+    let memory_position = processor.pop_u32()? as usize;
 
     let memory = processor.memory();
-    let value = unwrap_action!(memory.read_u8_at(memory_position));
-    unwrap_action!(processor.push_u8(value));
+    let value = memory.read_u8_at(memory_position)?;
+    processor.push_u8(value)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Loads a ?16 memory value and pushes it into the stack.
@@ -168,14 +168,14 @@ pub fn memory_load_8(processor: &mut Processor) -> Action {
 /// Stack:
 /// - u32 - Memory position.
 /// + ?16 - Memory value.
-pub fn memory_load_16(processor: &mut Processor) -> Action {
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_load_16(processor: &mut Processor) -> Result<(), Action> {
+    let memory_position = processor.pop_u32()? as usize;
 
     let memory = processor.memory();
-    let value = unwrap_action!(memory.read_u16_at(memory_position));
-    unwrap_action!(processor.push_u16(value));
+    let value = memory.read_u16_at(memory_position)?;
+    processor.push_u16(value)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Loads a ?32 memory value and pushes it into the stack.
@@ -184,14 +184,14 @@ pub fn memory_load_16(processor: &mut Processor) -> Action {
 /// Stack:
 /// - u32 - Memory position.
 /// + ?32 - Memory value.
-pub fn memory_load_32(processor: &mut Processor) -> Action {
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_load_32(processor: &mut Processor) -> Result<(), Action> {
+    let memory_position = processor.pop_u32()? as usize;
 
     let memory = processor.memory();
-    let value = unwrap_action!(memory.read_u32_at(memory_position));
-    unwrap_action!(processor.push_u32(value));
+    let value = memory.read_u32_at(memory_position)?;
+    processor.push_u32(value)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Loads a ?64 memory value and pushes it into the stack.
@@ -200,14 +200,14 @@ pub fn memory_load_32(processor: &mut Processor) -> Action {
 /// Stack:
 /// - u32 - Memory position.
 /// + ?64 - Memory value.
-pub fn memory_load_64(processor: &mut Processor) -> Action {
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_load_64(processor: &mut Processor) -> Result<(), Action> {
+    let memory_position = processor.pop_u32()? as usize;
 
     let memory = processor.memory();
-    let value = unwrap_action!(memory.read_u64_at(memory_position));
-    unwrap_action!(processor.push_u64(value));
+    let value = memory.read_u64_at(memory_position)?;
+    processor.push_u64(value)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Pops a ?8 value from the stack and stores it in memory.
@@ -216,14 +216,14 @@ pub fn memory_load_64(processor: &mut Processor) -> Action {
 /// Stack:
 /// - ?8  - Value.
 /// - u32 - Memory position.
-pub fn memory_store_8(processor: &mut Processor) -> Action {
-    let value = unwrap_action!(processor.pop_u8());
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_store_8(processor: &mut Processor) -> Result<(), Action> {
+    let value = processor.pop_u8()?;
+    let memory_position = processor.pop_u32()? as usize;
 
     let memory = processor.memory_mut();
-    unwrap_action!(memory.write_u8_at(memory_position, value));
+    memory.write_u8_at(memory_position, value)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Pops a ?16 value from the stack and stores it in memory.
@@ -232,14 +232,14 @@ pub fn memory_store_8(processor: &mut Processor) -> Action {
 /// Stack:
 /// - ?16  - Value.
 /// - u32 - Memory position.
-pub fn memory_store_16(processor: &mut Processor) -> Action {
-    let value = unwrap_action!(processor.pop_u16());
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_store_16(processor: &mut Processor) -> Result<(), Action> {
+    let value = processor.pop_u16()?;
+    let memory_position = processor.pop_u32()? as usize;
 
     let memory = processor.memory_mut();
-    unwrap_action!(memory.write_u16_at(memory_position, value));
+    memory.write_u16_at(memory_position, value)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Pops a ?32 value from the stack and stores it in memory.
@@ -248,14 +248,14 @@ pub fn memory_store_16(processor: &mut Processor) -> Action {
 /// Stack:
 /// - ?32  - Value.
 /// - u32 - Memory position.
-pub fn memory_store_32(processor: &mut Processor) -> Action {
-    let value = unwrap_action!(processor.pop_u32());
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_store_32(processor: &mut Processor) -> Result<(), Action> {
+    let value = processor.pop_u32()?;
+    let memory_position = processor.pop_u32()? as usize;
 
     let memory = processor.memory_mut();
-    unwrap_action!(memory.write_u32_at(memory_position, value));
+    memory.write_u32_at(memory_position, value)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Pops a ?64 value from the stack and stores it in memory.
@@ -264,14 +264,14 @@ pub fn memory_store_32(processor: &mut Processor) -> Action {
 /// Stack:
 /// - ?64  - Value.
 /// - u32 - Memory position.
-pub fn memory_store_64(processor: &mut Processor) -> Action {
-    let value = unwrap_action!(processor.pop_u64());
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn memory_store_64(processor: &mut Processor) -> Result<(), Action> {
+    let value = processor.pop_u64()?;
+    let memory_position = processor.pop_u32()? as usize;
 
     let memory = processor.memory_mut();
-    unwrap_action!(memory.write_u64_at(memory_position, value));
+    memory.write_u64_at(memory_position, value)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Loads a ?8 value from the program data and pushes it into the stack.
@@ -280,20 +280,20 @@ pub fn memory_store_64(processor: &mut Processor) -> Action {
 /// Stack:
 /// - u32 - Memory position.
 /// + ?8  - Program data value.
-pub fn program_data_load_8(processor: &mut Processor) -> Action {
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn program_data_load_8(processor: &mut Processor) -> Result<(), Action> {
+    let memory_position = processor.pop_u32()? as usize;
 
     let program = processor.program();
 
     let last_position = memory_position + std::mem::size_of::<u8>();
     if memory_position < program.data_pointer() || last_position > program.data_pointer_end() {
-        return Action::Panic("Data Segmentation Fault");
+        return Err(Action::Panic("Data Segmentation Fault"));
     }
 
-    let value = unwrap_action!(program.read_u8_at(memory_position));
-    unwrap_action!(processor.push_u8(value));
+    let value = program.read_u8_at(memory_position)?;
+    processor.push_u8(value)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Loads a ?16 value from the program data and pushes it into the stack.
@@ -302,20 +302,20 @@ pub fn program_data_load_8(processor: &mut Processor) -> Action {
 /// Stack:
 /// - u32 - Memory position.
 /// + ?16  - Program data value.
-pub fn program_data_load_16(processor: &mut Processor) -> Action {
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn program_data_load_16(processor: &mut Processor) -> Result<(), Action> {
+    let memory_position = processor.pop_u32()? as usize;
 
     let program = processor.program();
 
     let last_position = memory_position + std::mem::size_of::<u16>();
     if memory_position < program.data_pointer() || last_position > program.data_pointer_end() {
-        return Action::Panic("Data Segmentation Fault");
+        return Err(Action::Panic("Data Segmentation Fault"));
     }
 
-    let value = unwrap_action!(program.read_u16_at(memory_position));
-    unwrap_action!(processor.push_u16(value));
+    let value = program.read_u16_at(memory_position)?;
+    processor.push_u16(value)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Loads a ?32 value from the program data and pushes it into the stack.
@@ -324,20 +324,20 @@ pub fn program_data_load_16(processor: &mut Processor) -> Action {
 /// Stack:
 /// - u32 - Memory position.
 /// + ?32  - Program data value.
-pub fn program_data_load_32(processor: &mut Processor) -> Action {
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn program_data_load_32(processor: &mut Processor) -> Result<(), Action> {
+    let memory_position = processor.pop_u32()? as usize;
 
     let program = processor.program();
 
     let last_position = memory_position + std::mem::size_of::<u32>();
     if memory_position < program.data_pointer() || last_position > program.data_pointer_end() {
-        return Action::Panic("Data Segmentation Fault");
+        return Err(Action::Panic("Data Segmentation Fault"));
     }
 
-    let value = unwrap_action!(program.read_u32_at(memory_position));
-    unwrap_action!(processor.push_u32(value));
+    let value = program.read_u32_at(memory_position)?;
+    processor.push_u32(value)?;
 
-    Action::Ok
+    Ok(())
 }
 
 /// Loads a ?64 value from the program data and pushes it into the stack.
@@ -346,18 +346,18 @@ pub fn program_data_load_32(processor: &mut Processor) -> Action {
 /// Stack:
 /// - u32 - Memory position.
 /// + ?64  - Program data value.
-pub fn program_data_load_64(processor: &mut Processor) -> Action {
-    let memory_position = unwrap_action!(processor.pop_u32()) as usize;
+pub fn program_data_load_64(processor: &mut Processor) -> Result<(), Action> {
+    let memory_position = processor.pop_u32()? as usize;
 
     let program = processor.program();
 
     let last_position = memory_position + std::mem::size_of::<u64>();
     if memory_position < program.data_pointer() || last_position > program.data_pointer_end() {
-        return Action::Panic("Data Segmentation Fault");
+        return Err(Action::Panic("Data Segmentation Fault"));
     }
 
-    let value = unwrap_action!(program.read_u64_at(memory_position));
-    unwrap_action!(processor.push_u64(value));
+    let value = program.read_u64_at(memory_position)?;
+    processor.push_u64(value)?;
 
-    Action::Ok
+    Ok(())
 }

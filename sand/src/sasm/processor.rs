@@ -1,4 +1,4 @@
-use crate::sasm::{Action, Memory, Program, MEMORY_DEFAULT_PAGE_SIZE, MEMORY_DEFAULT_STACK_SIZE};
+use crate::sasm::{Action, Memory, Program, MEMORY_DEFAULT_PAGE_SIZE};
 
 /// A VM processor that carries with memory, registers, etc.
 pub struct Processor {
@@ -106,7 +106,7 @@ impl Processor {
 
     #[inline]
     pub fn set_program_counter(&mut self, program_counter: usize) -> Result<(), Action> {
-        if code_position >= processor.program().data_pointer_end() {
+        if program_counter >= self.program().data_pointer_end() {
             return Err(Action::Panic("Code Segmentation Fault"));
         }
 

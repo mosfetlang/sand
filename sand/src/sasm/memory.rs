@@ -1,5 +1,3 @@
-use std::convert::TryInto;
-
 use num_integer::Integer;
 
 use crate::sasm::Action;
@@ -116,81 +114,79 @@ impl Memory {
 
     fn read_at_single_page(&self, page_index: usize, index_in_page: usize, bytes: &mut [u8]) {
         let page = &self.pages[page_index];
-        let mut i = 0;
-        for p in index_in_page..bytes.len() {
-            bytes[i] = page[p];
-            i += 1;
-        }
+        let bytes_range = ..(bytes.len() - index_in_page);
+        let page_range = index_in_page..bytes.len();
+        bytes[bytes_range].clone_from_slice(&page[page_range]);
     }
 
     #[inline]
     pub fn read_u8_at(&self, index: usize) -> Result<u8, Action> {
         let mut bytes = [0; std::mem::size_of::<u8>()];
         self.read_at(index, &mut bytes)
-            .map(|_| u8::from_le_bytes(bytes.try_into().unwrap()))
+            .map(|_| u8::from_le_bytes(bytes))
     }
 
     #[inline]
     pub fn read_u16_at(&self, index: usize) -> Result<u16, Action> {
         let mut bytes = [0; std::mem::size_of::<u16>()];
         self.read_at(index, &mut bytes)
-            .map(|_| u16::from_le_bytes(bytes.try_into().unwrap()))
+            .map(|_| u16::from_le_bytes(bytes))
     }
 
     #[inline]
     pub fn read_u32_at(&self, index: usize) -> Result<u32, Action> {
         let mut bytes = [0; std::mem::size_of::<u32>()];
         self.read_at(index, &mut bytes)
-            .map(|_| u32::from_le_bytes(bytes.try_into().unwrap()))
+            .map(|_| u32::from_le_bytes(bytes))
     }
 
     #[inline]
     pub fn read_u64_at(&self, index: usize) -> Result<u64, Action> {
         let mut bytes = [0; std::mem::size_of::<u64>()];
         self.read_at(index, &mut bytes)
-            .map(|_| u64::from_le_bytes(bytes.try_into().unwrap()))
+            .map(|_| u64::from_le_bytes(bytes))
     }
 
     #[inline]
     pub fn read_i8_at(&self, index: usize) -> Result<i8, Action> {
         let mut bytes = [0; std::mem::size_of::<i8>()];
         self.read_at(index, &mut bytes)
-            .map(|_| i8::from_le_bytes(bytes.try_into().unwrap()))
+            .map(|_| i8::from_le_bytes(bytes))
     }
 
     #[inline]
     pub fn read_i16_at(&self, index: usize) -> Result<i16, Action> {
         let mut bytes = [0; std::mem::size_of::<i16>()];
         self.read_at(index, &mut bytes)
-            .map(|_| i16::from_le_bytes(bytes.try_into().unwrap()))
+            .map(|_| i16::from_le_bytes(bytes))
     }
 
     #[inline]
     pub fn read_i32_at(&self, index: usize) -> Result<i32, Action> {
         let mut bytes = [0; std::mem::size_of::<i32>()];
         self.read_at(index, &mut bytes)
-            .map(|_| i32::from_le_bytes(bytes.try_into().unwrap()))
+            .map(|_| i32::from_le_bytes(bytes))
     }
 
     #[inline]
     pub fn read_i64_at(&self, index: usize) -> Result<i64, Action> {
         let mut bytes = [0; std::mem::size_of::<i64>()];
         self.read_at(index, &mut bytes)
-            .map(|_| i64::from_le_bytes(bytes.try_into().unwrap()))
+            .map(|_| i64::from_le_bytes(bytes))
     }
 
     #[inline]
     pub fn read_f32_at(&self, index: usize) -> Result<f32, Action> {
         let mut bytes = [0; std::mem::size_of::<f32>()];
         self.read_at(index, &mut bytes)
-            .map(|_| f32::from_le_bytes(bytes.try_into().unwrap()))
+            .map(|_| f32::from_le_bytes(bytes))
     }
 
     #[inline]
     pub fn read_f64_at(&self, index: usize) -> Result<f64, Action> {
         let mut bytes = [0; std::mem::size_of::<f64>()];
         self.read_at(index, &mut bytes)
-            .map(|_| f64::from_le_bytes(bytes.try_into().unwrap()))
+            .map(|_| f64::from_le_bytes(bytes))
     }
 
     pub fn write_at(&mut self, index: usize, bytes: &[u8]) -> Result<(), Action> {
@@ -228,11 +224,7 @@ impl Memory {
 
     fn write_at_single_page(&mut self, page_index: usize, index_in_page: usize, bytes: &[u8]) {
         let page = &mut self.pages[page_index];
-        let mut i = 0;
-        for p in index_in_page..bytes.len() {
-            page[p] = bytes[i];
-            i += 1;
-        }
+        page[index_in_page..bytes.len()].clone_from_slice(&bytes[..(bytes.len() - index_in_page)]);
     }
 
     #[inline]

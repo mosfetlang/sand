@@ -52,6 +52,25 @@ pub enum Instruction {
     Const16,
     Const32,
     Const64,
+
+    // Arithmetic
+    Extend8To16 = 70,
+    Extend8To32,
+    Extend16To32,
+    Extend8To64,
+    Extend16To64,
+    Extend32To64,
+    ExtendSign8To16,
+    ExtendSign8To32,
+    ExtendSign16To32,
+    ExtendSign8To64,
+    ExtendSign16To64,
+    ExtendSign32To64,
+    Trunc16To8,
+    Trunc32To8,
+    Trunc64To8,
+    Trunc64To16,
+    Trunc64To32,
 }
 
 impl Instruction {
@@ -61,13 +80,15 @@ impl Instruction {
         *self as usize
     }
 
-    pub fn method(&self) -> fn(&mut Processor) -> Action {
+    pub fn method(&self) -> fn(&mut Processor) -> Result<(), Action> {
         let index = *self as usize;
         INSTRUCTION_LIST[index]
     }
 }
 
-pub static INSTRUCTION_LIST: [fn(&mut Processor) -> Action; 256] = [
+pub type InstructionFunction = fn(&mut Processor) -> Result<(), Action>;
+
+pub static INSTRUCTION_LIST: [InstructionFunction; 256] = [
     // General
     unreachable, // 0
     nop,
@@ -151,11 +172,11 @@ pub static INSTRUCTION_LIST: [fn(&mut Processor) -> Action; 256] = [
     extend_sign_8_to_64,
     extend_sign_16_to_64, // 80
     extend_sign_32_to_64,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
-    unreachable,
+    trunc_16_to_8,
+    trunc_32_to_8,
+    trunc_64_to_8,
+    trunc_64_to_16,
+    trunc_64_to_32,
     unreachable,
     unreachable,
     unreachable,
